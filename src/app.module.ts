@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CountriesModule } from './modules/countries/countries.module';
 import { LeaguesModule } from './modules/leagues/leagues.module';
 import { CitiesModule } from './modules/cities/cities.module';
+import { TeamsModule } from './modules/teams/teams.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CitiesModule } from './modules/cities/cities.module';
     CountriesModule,
     CitiesModule,
     LeaguesModule,
+    TeamsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

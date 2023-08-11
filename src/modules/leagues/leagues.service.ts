@@ -21,6 +21,9 @@ export class LeaguesService {
   }
 
   async findById(id: string): Promise<League | null> {
-    return this.leagueModel.findById(id).populate(['game', 'country']).exec();
+    return this.leagueModel
+      .findById(id)
+      .populate([{ path: 'game' }, { path: 'country' }])
+      .exec();
   }
 }
