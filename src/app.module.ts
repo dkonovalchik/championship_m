@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CountriesModule } from './modules/countries/countries.module';
 import { LeaguesModule } from './modules/leagues/leagues.module';
+import { CitiesModule } from './modules/cities/cities.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { LeaguesModule } from './modules/leagues/leagues.module';
     }),
     GamesModule,
     CountriesModule,
+    CitiesModule,
     LeaguesModule,
   ],
   controllers: [AppController],

@@ -10,11 +10,13 @@ export class LeaguesService {
 
   async create(dto: CreateLeagueDto): Promise<League> {
     console.log('LeaguesService.create = dto:', dto);
+
     const createdLeague = new this.leagueModel({
       name: dto.name,
       game: new Types.ObjectId(dto.gameId),
       country: new Types.ObjectId(dto.countryId),
     });
+
     return createdLeague.save();
   }
 
