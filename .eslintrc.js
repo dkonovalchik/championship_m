@@ -4,10 +4,7 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2021,
   },
-  extends: [
-    'plugin:@typescript-eslint/recommended',
-    'plugin:prettier/recommended',
-  ],
+  extends: ['plugin:@typescript-eslint/recommended', 'plugin:prettier/recommended'],
   overrides: [
     {
       files: ['*.js', '*.ts', '*.jsx', '*.tsx'],
