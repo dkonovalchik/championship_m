@@ -13,7 +13,7 @@ export class GamesService {
     return createdGame.save();
   }
 
-  async findAll(): Promise<Game[]> {
-    return this.gameModel.find().exec();
+  async findById(id: string): Promise<Game | null> {
+    return this.gameModel.findById(id).exec();
   }
 }

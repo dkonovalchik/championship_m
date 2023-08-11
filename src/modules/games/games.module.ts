@@ -8,7 +8,7 @@ import { Game, GameSchema } from 'src/schemas/game.schema';
   imports: [
     MongooseModule.forFeature([
       {
-        name: 'Game',
+        name: Game.name,
         schema: GameSchema,
       },
     ]),

@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { GamesModule } from './modules/games/games.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { CountriesModule } from './modules/countries/countries.module';
+import { LeaguesModule } from './modules/leagues/leagues.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       }),
     }),
     GamesModule,
+    CountriesModule,
+    LeaguesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
