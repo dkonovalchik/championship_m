@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MatchesService } from './matches.service';
 import { MongodbProvider } from '../../system/mongodb/mongodb.provider';
+import { MONGODB_CONNECTION } from '../../../lib/constants';
+import { testMongoConnectionFactory } from '../../../lib/test-mongo-connection';
 
 describe('MatchesService', () => {
   let service: MatchesService;
@@ -15,7 +17,12 @@ describe('MatchesService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [MatchesService, MongodbProvider],
-    }).compile();
+    })
+      .overrideProvider(MONGODB_CONNECTION)
+      .useFactory({
+        factory: testMongoConnectionFactory,
+      })
+      .compile();
 
     service = module.get<MatchesService>(MatchesService);
   });

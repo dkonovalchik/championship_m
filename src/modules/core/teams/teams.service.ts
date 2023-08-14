@@ -2,14 +2,13 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { v4 as uuid } from 'uuid';
 import { Db } from 'mongodb';
+import { MONGODB_CONNECTION } from '../../../lib/constants';
 
 @Injectable()
 export class TeamsService {
-  constructor(@Inject('MONGODB_CONNECTION') private readonly db: Db) {}
+  constructor(@Inject(MONGODB_CONNECTION) private readonly db: Db) {}
 
   async create(dto: CreateTeamDto) {
-    console.log('TeamsService.create = dto:', dto);
-
     const newTeam = {
       id: uuid(),
       ...dto,

@@ -2,14 +2,13 @@ import { Inject, Injectable } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { Db } from 'mongodb';
+import { MONGODB_CONNECTION } from '../../../lib/constants';
 
 @Injectable()
 export class MatchesService {
-  constructor(@Inject('MONGODB_CONNECTION') private readonly db: Db) {}
+  constructor(@Inject(MONGODB_CONNECTION) private readonly db: Db) {}
 
   async create(dto: CreateMatchDto) {
-    console.log('MatchesService.create = dto:', dto);
-
     const newMatch = {
       id: uuid(),
       ...dto,

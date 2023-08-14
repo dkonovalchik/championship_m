@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { GamesService } from './games.service';
 import { MongodbProvider } from '../../system/mongodb/mongodb.provider';
 import { GamesController } from './games.controller';
+import { testMongoConnectionFactory } from '../../../lib/test-mongo-connection';
+import { MONGODB_CONNECTION } from '../../../lib/constants';
 
 describe('GamesController', () => {
   let controller: GamesController;
@@ -13,10 +15,17 @@ describe('GamesController', () => {
   };
 
   beforeEach(async () => {
+    // const testMongoConnection = await getTestMongoConnection();
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [GamesController],
       providers: [GamesService, MongodbProvider],
-    }).compile();
+    })
+      .overrideProvider(MONGODB_CONNECTION)
+      .useFactory({
+        factory: testMongoConnectionFactory,
+      })
+      .compile();
 
     controller = module.get<GamesController>(GamesController);
   });

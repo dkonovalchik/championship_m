@@ -2,14 +2,13 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreateCityDto } from './dto/create-city.dto';
 import { v4 as uuid } from 'uuid';
 import { Db } from 'mongodb';
+import { MONGODB_CONNECTION } from '../../../lib/constants';
 
 @Injectable()
 export class CitiesService {
-  constructor(@Inject('MONGODB_CONNECTION') private readonly db: Db) {}
+  constructor(@Inject(MONGODB_CONNECTION) private readonly db: Db) {}
 
   async create(dto: CreateCityDto) {
-    console.log('CitiesService.create = dto:', dto);
-
     const newCity = {
       id: uuid(),
       ...dto,
