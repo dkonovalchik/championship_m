@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TeamsService } from './teams.service';
 import { MongodbProvider } from '../../system/mongodb/mongodb.provider';
 import { TeamsController } from './teams.controller';
-import { testMongoConnectionFactory } from '../../../lib/test-mongo-connection';
+import { testMongoConnectionFactory } from '../../../../test/utils/test-mongo-connection';
 import { MONGODB_CONNECTION } from '../../../lib/constants';
 
 describe('TeamsController', () => {

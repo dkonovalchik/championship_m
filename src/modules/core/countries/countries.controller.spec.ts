@@ -3,7 +3,7 @@ import { CountriesController } from './countries.controller';
 import { MongodbProvider } from '../../system/mongodb/mongodb.provider';
 import { CountriesService } from './countries.service';
 import { MONGODB_CONNECTION } from '../../../lib/constants';
-import { testMongoConnectionFactory } from '../../../lib/test-mongo-connection';
+import { testMongoConnectionFactory } from '../../../../test/utils/test-mongo-connection';
 
 describe('CountriesController', () => {
   let controller: CountriesController;

@@ -1,11 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GamesService } from './games.service';
 import { MongodbProvider } from '../../system/mongodb/mongodb.provider';
-import { testMongoConnectionFactory } from '../../../lib/test-mongo-connection';
+import { testMongoConnectionFactory } from '../../../../test/utils/test-mongo-connection';
 import { MONGODB_CONNECTION } from '../../../lib/constants';
+import { Db } from 'mongodb';
 
 describe('GamesService', () => {
   let service: GamesService;
+  let db: Db;
+  let gamesCollection;
 
   const TEST_GAME = {
     name: 'Basketball',
@@ -24,6 +27,8 @@ describe('GamesService', () => {
       .compile();
 
     service = module.get<GamesService>(GamesService);
+    db = module.get<Db>(MONGODB_CONNECTION);
+    gamesCollection = db.collection('games');
   });
 
   it('should be defined', () => {
@@ -31,24 +36,46 @@ describe('GamesService', () => {
   });
 
   it('should create new game and return it', async () => {
-    const createdGame = await service.create(TEST_GAME);
+    // call
+    const createResult = await service.create(TEST_GAME);
 
-    expect(createdGame).not.toBeNull();
-    expect(createdGame.id).toBeDefined();
-    expect(createdGame.name).toBe(TEST_GAME.name);
-    expect(createdGame.periodCount).toBe(TEST_GAME.periodCount);
-    expect(createdGame.periodLength).toBe(TEST_GAME.periodLength);
+    // check
+    expect(createResult).not.toBeNull();
+    expect(createResult.id).toBeDefined();
+    expect(createResult).toMatchObject(TEST_GAME);
+
+    const gameInDb = await gamesCollection.findOne({ id: createResult.id });
+    expect(gameInDb.id).toBeDefined();
+    expect(gameInDb).toMatchObject(TEST_GAME);
   });
 
   it('should find game by id and return it', async () => {
-    const gameInDb = await service.create(TEST_GAME);
+    // prepare
+    const insertResult = await gamesCollection.insertOne(TEST_GAME);
+    const insertedGame = await gamesCollection.findOne({ _id: insertResult.insertedId });
 
-    const foundGame = await service.findById(gameInDb.id);
+    // call
+    const findResult = await service.findById(insertedGame.id);
 
-    expect(foundGame).not.toBeNull();
-    expect(foundGame.id).toBe(gameInDb.id);
-    expect(foundGame.name).toBe(gameInDb.name);
-    expect(foundGame.periodCount).toBe(gameInDb.periodCount);
-    expect(foundGame.periodLength).toBe(gameInDb.periodLength);
+    // check
+    expect(findResult).not.toBeNull();
+    expect(findResult).toMatchObject(TEST_GAME);
+  });
+
+  it('should delete game by id and return it', async () => {
+    // prepare
+    const insertResult = await gamesCollection.insertOne(TEST_GAME);
+    const insertedGame = await gamesCollection.findOne({ _id: insertResult.insertedId });
+
+    // call
+    const deleteResult = await service.deleteById(insertedGame.id);
+
+    // check
+    expect(deleteResult).not.toBeNull();
+    expect(deleteResult.id).toBe(insertedGame.id);
+    expect(deleteResult).toMatchObject(TEST_GAME);
+
+    const nonDeletedGame = await gamesCollection.findOne({ _id: insertedGame._id });
+    expect(nonDeletedGame).toBeNull();
   });
 });

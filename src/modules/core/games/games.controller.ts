@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { CreateGameDto } from './dto/create-game.dto';
+import { UpdateGameDto } from './dto/update-game.dto';
 
 @Controller('games')
 export class GamesController {
@@ -14,5 +15,15 @@ export class GamesController {
   @Get(':id')
   async findById(@Param('id') id: string) {
     return await this.gamesService.findById(id);
+  }
+
+  @Put(':id')
+  async updateById(@Param('id') id: string, @Body() dto: UpdateGameDto) {
+    return await this.gamesService.updateById(id, dto);
+  }
+
+  @Delete('%id')
+  async deleteById(@Param('id') id: string) {
+    return await this.gamesService.deleteById(id);
   }
 }

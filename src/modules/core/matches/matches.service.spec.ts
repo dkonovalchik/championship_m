@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MatchesService } from './matches.service';
 import { MongodbProvider } from '../../system/mongodb/mongodb.provider';
 import { MONGODB_CONNECTION } from '../../../lib/constants';
-import { testMongoConnectionFactory } from '../../../lib/test-mongo-connection';
+import { testMongoConnectionFactory } from '../../../../test/utils/test-mongo-connection';
 
 describe('MatchesService', () => {
   let service: MatchesService;
