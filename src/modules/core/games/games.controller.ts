@@ -22,8 +22,9 @@ export class GamesController {
     return await this.gamesService.updateById(id, dto);
   }
 
-  @Delete('%id')
+  @Delete(':id')
   async deleteById(@Param('id') id: string) {
+    console.log('delete - id:', id);
     return await this.gamesService.deleteById(id);
   }
 }
