@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CountriesController } from './countries.controller';
-import { MongodbProvider } from '../../system/mongodb/mongodb.provider';
 import { CountriesService } from './countries.service';
 import { MONGODB_CONNECTION } from '../../../lib/constants';
 import { testMongoConnectionFactory } from '../../../../test/utils/test-mongo-connection';
@@ -15,13 +14,14 @@ describe('CountriesController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [CountriesController],
-      providers: [CountriesService, MongodbProvider],
-    })
-      .overrideProvider(MONGODB_CONNECTION)
-      .useFactory({
-        factory: testMongoConnectionFactory,
-      })
-      .compile();
+      providers: [
+        CountriesService,
+        {
+          provide: MONGODB_CONNECTION,
+          useFactory: testMongoConnectionFactory,
+        },
+      ],
+    }).compile();
 
     controller = module.get<CountriesController>(CountriesController);
   });
