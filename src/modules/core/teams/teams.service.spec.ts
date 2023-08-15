@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TeamsService } from './teams.service';
-import { testMongoConnectionFactory } from '../../../../test/utils/test-mongo-connection';
-import { MONGODB_CONNECTION } from '../../../lib/constants';
+import { testMongoConnectionFactory } from 'src/lib/test-mongo-connection';
+import { MONGODB_CONNECTION } from 'src/lib/constants';
 
 describe('TeamsService', () => {
   let service: TeamsService;

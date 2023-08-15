@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreateCountryDto } from './dto/create-country.dto';
 import { v4 as uuid } from 'uuid';
 import { Db } from 'mongodb';
-import { MONGODB_CONNECTION } from '../../../lib/constants';
+import { MONGODB_CONNECTION } from 'src/lib/constants';
 
 @Injectable()
 export class CountriesService {

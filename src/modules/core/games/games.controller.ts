@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { GamesService } from './games.service';
 import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
+import { CannotFindRecordException } from 'src/lib/exceptions';
 
 @Controller('games')
 export class GamesController {
@@ -14,17 +15,28 @@ export class GamesController {
 
   @Get(':id')
   async findById(@Param('id') id: string) {
-    return await this.gamesService.findById(id);
+    const foundGame = await this.gamesService.findById(id);
+    if (!foundGame) {
+      throw new CannotFindRecordException();
+    }
+    return foundGame;
   }
 
   @Put(':id')
   async updateById(@Param('id') id: string, @Body() dto: UpdateGameDto) {
-    return await this.gamesService.updateById(id, dto);
+    const updatedGame = await this.gamesService.updateById(id, dto);
+    if (!updatedGame) {
+      throw new CannotFindRecordException();
+    }
+    return updatedGame;
   }
 
   @Delete(':id')
   async deleteById(@Param('id') id: string) {
-    console.log('delete - id:', id);
-    return await this.gamesService.deleteById(id);
+    const deletedGame = await this.gamesService.deleteById(id);
+    if (!deletedGame) {
+      throw new CannotFindRecordException();
+    }
+    return deletedGame;
   }
 }

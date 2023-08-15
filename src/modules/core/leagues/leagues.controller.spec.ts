@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { LeaguesService } from './leagues.service';
 import { LeaguesController } from './leagues.controller';
-import { MONGODB_CONNECTION } from '../../../lib/constants';
-import { testMongoConnectionFactory } from '../../../../test/utils/test-mongo-connection';
+import { MONGODB_CONNECTION } from 'src/lib/constants';
+import { testMongoConnectionFactory } from 'src/lib/test-mongo-connection';
 
 describe('LeaguesController', () => {
   let controller: LeaguesController;

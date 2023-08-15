@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TeamsService } from './teams.service';
 import { TeamsController } from './teams.controller';
-import { testMongoConnectionFactory } from '../../../../test/utils/test-mongo-connection';
-import { MONGODB_CONNECTION } from '../../../lib/constants';
+import { testMongoConnectionFactory } from 'src/lib/test-mongo-connection';
+import { MONGODB_CONNECTION } from 'src/lib/constants';
 
 describe('TeamsController', () => {
   let controller: TeamsController;

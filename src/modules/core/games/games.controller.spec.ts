@@ -1,12 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GamesService } from './games.service';
 import { GamesController } from './games.controller';
-import { testMongoConnectionFactory } from '../../../../test/utils/test-mongo-connection';
-import { MONGODB_CONNECTION } from '../../../lib/constants';
-import { Db } from 'mongodb';
+import { testMongoConnectionFactory } from 'src/lib/test-mongo-connection';
+import { MONGODB_CONNECTION } from 'src/lib/constants';
 
 describe('GamesController', () => {
-  let controller: GamesController;
+  let gamesController: GamesController;
+  let gamesService: GamesService;
+
+  const TEST_GAME = {
+    id: 'abcde',
+    name: 'Basketball',
+    periodCount: 4,
+    periodLength: 15,
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -20,10 +27,22 @@ describe('GamesController', () => {
       ],
     }).compile();
 
-    controller = module.get<GamesController>(GamesController);
+    gamesController = module.get<GamesController>(GamesController);
+    gamesService = module.get<GamesService>(GamesService);
   });
 
   it('should be defined', () => {
-    expect(controller).toBeDefined();
+    expect(gamesController).toBeDefined();
+  });
+
+  it('should return created game', async () => {
+    // arrange
+    jest.spyOn(gamesService, 'create').mockResolvedValue(TEST_GAME);
+
+    // act
+    const result = await gamesService.create(TEST_GAME);
+
+    //assert
+    expect(result).toBe(TEST_GAME);
   });
 });
