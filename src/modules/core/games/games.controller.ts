@@ -1,8 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
-import { CannotFindRecordException } from 'src/lib/exceptions';
+import { RecordNotFound } from 'src/lib/exceptions';
 
 @Controller('games')
 export class GamesController {
@@ -17,16 +17,17 @@ export class GamesController {
   async findById(@Param('id') id: string) {
     const foundGame = await this.gamesService.findById(id);
     if (!foundGame) {
-      throw new CannotFindRecordException();
+      throw new RecordNotFound();
     }
     return foundGame;
   }
 
-  @Put(':id')
+  @Patch(':id')
   async updateById(@Param('id') id: string, @Body() dto: UpdateGameDto) {
+    console.log('updateById - id:', id, ', dto:', dto);
     const updatedGame = await this.gamesService.updateById(id, dto);
     if (!updatedGame) {
-      throw new CannotFindRecordException();
+      throw new RecordNotFound();
     }
     return updatedGame;
   }
@@ -35,7 +36,7 @@ export class GamesController {
   async deleteById(@Param('id') id: string) {
     const deletedGame = await this.gamesService.deleteById(id);
     if (!deletedGame) {
-      throw new CannotFindRecordException();
+      throw new RecordNotFound();
     }
     return deletedGame;
   }

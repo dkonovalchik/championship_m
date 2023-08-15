@@ -4,6 +4,7 @@ import { v4 as uuid } from 'uuid';
 import { Db } from 'mongodb';
 import { MONGODB_CONNECTION } from 'src/lib/constants';
 import { UpdateGameDto } from './dto/update-game.dto';
+import { CannotDeleteRecordWithChildren } from 'src/lib/exceptions';
 
 @Injectable()
 export class GamesService {
@@ -32,6 +33,16 @@ export class GamesService {
   }
 
   async deleteById(id: string) {
+    const childLeague = await this.db.collection('leagues').findOne({ gameId: id });
+    if (childLeague) {
+      throw new CannotDeleteRecordWithChildren();
+    }
+
+    const childTeam = await this.db.collection('teams').findOne({ gameId: id });
+    if (childTeam) {
+      throw new CannotDeleteRecordWithChildren();
+    }
+
     const deleteResult = await this.db.collection('games').findOneAndDelete({ id });
     return deleteResult.value;
   }

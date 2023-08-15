@@ -3,9 +3,11 @@ import { GamesService } from './games.service';
 import { testMongoConnectionFactory } from 'src/lib/test-mongo-connection';
 import { MONGODB_CONNECTION } from 'src/lib/constants';
 import { Db } from 'mongodb';
+import { HttpException } from '@nestjs/common';
+import { CannotDeleteRecordWithChildren } from 'src/lib/exceptions';
 
 describe('GamesService', () => {
-  let service: GamesService;
+  let gamesService: GamesService;
   let db: Db;
   let gamesCollection;
 
@@ -21,6 +23,7 @@ describe('GamesService', () => {
     periodLength: 45,
   };
 
+  const TEST_ID = 'test_id';
   const WRONG_ID = 'wrong_id';
 
   beforeEach(async () => {
@@ -34,19 +37,19 @@ describe('GamesService', () => {
       ],
     }).compile();
 
-    service = module.get<GamesService>(GamesService);
+    gamesService = module.get<GamesService>(GamesService);
     db = module.get<Db>(MONGODB_CONNECTION);
     gamesCollection = db.collection('games');
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(gamesService).toBeDefined();
   });
 
   describe('create', () => {
     it('should create new game and return it', async () => {
       // act
-      const createResult = await service.create(TEST_GAME);
+      const createResult = await gamesService.create(TEST_GAME);
 
       // assert
       expect(createResult).not.toBeNull();
@@ -59,14 +62,14 @@ describe('GamesService', () => {
     });
   });
 
-  describe('find', () => {
+  describe('read', () => {
     it('should find game by id and return it', async () => {
       // arrange
       const insertResult = await gamesCollection.insertOne(TEST_GAME);
       const insertedGame = await gamesCollection.findOne({ _id: insertResult.insertedId });
 
       // act
-      const findResult = await service.findById(insertedGame.id);
+      const findResult = await gamesService.findById(insertedGame.id);
 
       // assert
       expect(findResult).not.toBeNull();
@@ -75,7 +78,7 @@ describe('GamesService', () => {
 
     it('return null if game is not found', async () => {
       // act
-      const findResult = await service.findById(WRONG_ID);
+      const findResult = await gamesService.findById(WRONG_ID);
 
       // assert
       expect(findResult).toBeNull();
@@ -89,7 +92,7 @@ describe('GamesService', () => {
       const insertedGame = await gamesCollection.findOne({ _id: insertResult.insertedId });
 
       // act
-      const updateResult = await service.updateById(insertedGame.id, TEST_GAME_UPDATE);
+      const updateResult = await gamesService.updateById(insertedGame.id, TEST_GAME_UPDATE);
 
       // assert
       expect(updateResult).not.toBeNull();
@@ -102,7 +105,7 @@ describe('GamesService', () => {
 
     it('return null if game to update is not found', async () => {
       // act
-      const updateResult = await service.updateById(WRONG_ID, TEST_GAME_UPDATE);
+      const updateResult = await gamesService.updateById(WRONG_ID, TEST_GAME_UPDATE);
 
       // assert
       expect(updateResult).toBeNull();
@@ -116,7 +119,7 @@ describe('GamesService', () => {
       const insertedGame = await gamesCollection.findOne({ _id: insertResult.insertedId });
 
       // act
-      const deleteResult = await service.deleteById(insertedGame.id);
+      const deleteResult = await gamesService.deleteById(insertedGame.id);
 
       // assert
       expect(deleteResult).not.toBeNull();
@@ -129,10 +132,44 @@ describe('GamesService', () => {
 
     it('return null if game to delete is not found', async () => {
       // act
-      const deleteResult = await service.deleteById(WRONG_ID);
+      const deleteResult = await gamesService.deleteById(WRONG_ID);
 
       // assert
       expect(deleteResult).toBeNull();
+    });
+
+    it('throw exception if game to delete has child league', async () => {
+      // prepare
+      await db.collection('leagues').insertOne({ gameId: TEST_ID });
+
+      // act
+      let error: HttpException;
+      try {
+        await gamesService.deleteById(TEST_ID);
+      } catch (e) {
+        error = e;
+      }
+
+      // assert
+      expect(error).toBeDefined();
+      expect(error).toBeInstanceOf(CannotDeleteRecordWithChildren);
+    });
+
+    it('throw exception if game to delete has child team', async () => {
+      // prepare
+      await db.collection('teams').insertOne({ gameId: TEST_ID });
+
+      // act
+      let error: HttpException;
+      try {
+        await gamesService.deleteById(TEST_ID);
+      } catch (e) {
+        error = e;
+      }
+
+      // assert
+      expect(error).toBeDefined();
+      expect(error).toBeInstanceOf(CannotDeleteRecordWithChildren);
     });
   });
 });
