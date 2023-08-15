@@ -3,23 +3,29 @@ import { GamesService } from './games.service';
 import { GamesController } from './games.controller';
 import { testMongoConnectionFactory } from 'src/lib/test-mongo-connection';
 import { MONGODB_CONNECTION } from 'src/lib/constants';
-import { ObjectId } from 'mongodb';
 import { RecordNotFound } from 'src/lib/exceptions';
 import { HttpException } from '@nestjs/common';
+import { ObjectId } from 'mongodb';
 
 describe('GamesController', () => {
-  let gamesController: GamesController;
-  let gamesService: GamesService;
-
   const TEST_GAME = {
     _id: new ObjectId('aaaaaaaaaaaaaaaaaaaaaaaa'),
-    id: 'abcde',
-    name: 'Basketball',
+    id: 'test_id',
+    name: 'Name',
     periodCount: 4,
     periodLength: 15,
   };
 
-  const TEST_ID = 'test_id';
+  const TEST_GAME_UPDATE = {
+    name: 'New Name',
+    periodCount: 2,
+    periodLength: 45,
+  };
+
+  const TEST_GAME_UPDATED = { ...TEST_GAME, ...TEST_GAME_UPDATE };
+
+  let gamesController: GamesController;
+  let gamesService: GamesService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -60,7 +66,7 @@ describe('GamesController', () => {
       jest.spyOn(gamesService, 'findById').mockResolvedValue(TEST_GAME);
 
       // act
-      const result = await gamesController.findById(TEST_ID);
+      const result = await gamesController.findById(TEST_GAME.id);
 
       // assert
       expect(result).toBe(TEST_GAME);
@@ -73,7 +79,7 @@ describe('GamesController', () => {
       // act
       let error: HttpException;
       try {
-        await gamesController.findById(TEST_ID);
+        await gamesController.findById(TEST_GAME.id);
       } catch (e) {
         error = e;
       }
@@ -87,13 +93,13 @@ describe('GamesController', () => {
   describe('update', () => {
     it('should return updated game', async () => {
       // arrange
-      jest.spyOn(gamesService, 'updateById').mockResolvedValue(TEST_GAME);
+      jest.spyOn(gamesService, 'updateById').mockResolvedValue(TEST_GAME_UPDATED);
 
       // act
-      const result = await gamesController.updateById(TEST_ID, TEST_GAME);
+      const result = await gamesController.updateById(TEST_GAME.id, TEST_GAME_UPDATE);
 
       //assert
-      expect(result).toBe(TEST_GAME);
+      expect(result).toBe(TEST_GAME_UPDATED);
     });
 
     it('should throw exception if the game to update is not found', async () => {
@@ -103,7 +109,7 @@ describe('GamesController', () => {
       // act
       let error: HttpException;
       try {
-        await gamesController.updateById(TEST_ID, TEST_GAME);
+        await gamesController.updateById(TEST_GAME.id, TEST_GAME_UPDATE);
       } catch (e) {
         error = e;
       }
@@ -120,7 +126,7 @@ describe('GamesController', () => {
       jest.spyOn(gamesService, 'deleteById').mockResolvedValue(TEST_GAME);
 
       // act
-      const result = await gamesController.deleteById(TEST_ID);
+      const result = await gamesController.deleteById(TEST_GAME.id);
 
       //assert
       expect(result).toBe(TEST_GAME);
@@ -133,7 +139,7 @@ describe('GamesController', () => {
       // act
       let error: HttpException;
       try {
-        await gamesController.deleteById(TEST_ID);
+        await gamesController.deleteById(TEST_GAME.id);
       } catch (e) {
         error = e;
       }

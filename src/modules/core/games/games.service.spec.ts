@@ -7,24 +7,26 @@ import { HttpException } from '@nestjs/common';
 import { CannotDeleteRecordWithChildren } from 'src/lib/exceptions';
 
 describe('GamesService', () => {
-  let gamesService: GamesService;
-  let db: Db;
-  let gamesCollection;
-
   const TEST_GAME = {
-    name: 'Basketball',
+    id: 'test_id',
+    name: 'Name',
     periodCount: 4,
     periodLength: 15,
   };
 
   const TEST_GAME_UPDATE = {
-    name: 'Football',
+    name: 'New Name',
     periodCount: 2,
     periodLength: 45,
   };
 
-  const TEST_ID = 'test_id';
   const WRONG_ID = 'wrong_id';
+
+  const TEST_GAME_UPDATED = { ...TEST_GAME, ...TEST_GAME_UPDATE };
+
+  let gamesService: GamesService;
+  let db: Db;
+  let gamesCollection;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -57,6 +59,7 @@ describe('GamesService', () => {
       expect(createResult).toMatchObject(TEST_GAME);
 
       const gameInDb = await gamesCollection.findOne({ id: createResult.id });
+      expect(gameInDb).not.toBeNull();
       expect(gameInDb.id).toBeDefined();
       expect(gameInDb).toMatchObject(TEST_GAME);
     });
@@ -76,7 +79,7 @@ describe('GamesService', () => {
       expect(findResult).toMatchObject(TEST_GAME);
     });
 
-    it('return null if game is not found', async () => {
+    it('should return null if game is not found', async () => {
       // act
       const findResult = await gamesService.findById(WRONG_ID);
 
@@ -97,13 +100,14 @@ describe('GamesService', () => {
       // assert
       expect(updateResult).not.toBeNull();
       expect(updateResult.id).toBe(insertedGame.id);
-      expect(updateResult).toMatchObject(TEST_GAME_UPDATE);
+      expect(updateResult).toMatchObject(TEST_GAME_UPDATED);
 
       const updatedGame = await gamesCollection.findOne({ _id: insertedGame._id });
-      expect(updatedGame).toMatchObject(TEST_GAME_UPDATE);
+      expect(updatedGame).not.toBeNull();
+      expect(updatedGame).toMatchObject(TEST_GAME_UPDATED);
     });
 
-    it('return null if game to update is not found', async () => {
+    it('should return null if game to update is not found', async () => {
       // act
       const updateResult = await gamesService.updateById(WRONG_ID, TEST_GAME_UPDATE);
 
@@ -130,7 +134,7 @@ describe('GamesService', () => {
       expect(nonDeletedGame).toBeNull();
     });
 
-    it('return null if game to delete is not found', async () => {
+    it('should return null if game to delete is not found', async () => {
       // act
       const deleteResult = await gamesService.deleteById(WRONG_ID);
 
@@ -138,14 +142,15 @@ describe('GamesService', () => {
       expect(deleteResult).toBeNull();
     });
 
-    it('throw exception if game to delete has child league', async () => {
+    it('should throw exception if game to delete has child league', async () => {
       // prepare
-      await db.collection('leagues').insertOne({ gameId: TEST_ID });
+      await gamesCollection.insertOne(TEST_GAME);
+      await db.collection('leagues').insertOne({ gameId: TEST_GAME.id });
 
       // act
       let error: HttpException;
       try {
-        await gamesService.deleteById(TEST_ID);
+        await gamesService.deleteById(TEST_GAME.id);
       } catch (e) {
         error = e;
       }
@@ -155,14 +160,15 @@ describe('GamesService', () => {
       expect(error).toBeInstanceOf(CannotDeleteRecordWithChildren);
     });
 
-    it('throw exception if game to delete has child team', async () => {
+    it('should throw exception if game to delete has child team', async () => {
       // prepare
-      await db.collection('teams').insertOne({ gameId: TEST_ID });
+      await gamesCollection.insertOne(TEST_GAME);
+      await db.collection('teams').insertOne({ gameId: TEST_GAME.id });
 
       // act
       let error: HttpException;
       try {
-        await gamesService.deleteById(TEST_ID);
+        await gamesService.deleteById(TEST_GAME.id);
       } catch (e) {
         error = e;
       }
