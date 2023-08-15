@@ -1,6 +1,8 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { CitiesService } from './cities.service';
 import { CreateCityDto } from './dto/create-city.dto';
+import { RecordNotFound } from 'src/lib/exceptions';
+import { UpdateCityDto } from './dto/update-city.dto';
 
 @Controller('cities')
 export class CitiesController {
@@ -13,6 +15,28 @@ export class CitiesController {
 
   @Get(':id')
   async findById(@Param('id') id: string) {
-    return await this.citiesService.findById(id);
+    const foundCity = await this.citiesService.findById(id);
+    if (!foundCity) {
+      throw new RecordNotFound();
+    }
+    return foundCity;
+  }
+
+  @Patch(':id')
+  async updateById(@Param('id') id: string, @Body() dto: UpdateCityDto) {
+    const updatedGame = await this.citiesService.updateById(id, dto);
+    if (!updatedGame) {
+      throw new RecordNotFound();
+    }
+    return updatedGame;
+  }
+
+  @Delete(':id')
+  async deleteById(@Param('id') id: string) {
+    const deletedGame = await this.citiesService.deleteById(id);
+    if (!deletedGame) {
+      throw new RecordNotFound();
+    }
+    return deletedGame;
   }
 }

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { GamesService } from './games.service';
 import { testMongoConnectionFactory } from 'src/lib/test-mongo-connection';
 import { MONGODB_CONNECTION } from 'src/lib/constants';
-import { Db } from 'mongodb';
+import { Collection, Db, Document } from 'mongodb';
 import { HttpException } from '@nestjs/common';
 import { CannotDeleteRecordWithChildren } from 'src/lib/exceptions';
 
@@ -26,7 +26,7 @@ describe('GamesService', () => {
 
   let gamesService: GamesService;
   let db: Db;
-  let gamesCollection;
+  let gamesCollection: Collection<Document>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
