@@ -15,6 +15,14 @@ describe('GamesService', () => {
     periodLength: 15,
   };
 
+  const TEST_GAME_UPDATE = {
+    name: 'Football',
+    periodCount: 2,
+    periodLength: 45,
+  };
+
+  const WRONG_ID = 'wrong_id';
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -35,47 +43,96 @@ describe('GamesService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should create new game and return it', async () => {
-    // call
-    const createResult = await service.create(TEST_GAME);
+  describe('create', () => {
+    it('should create new game and return it', async () => {
+      // act
+      const createResult = await service.create(TEST_GAME);
 
-    // check
-    expect(createResult).not.toBeNull();
-    expect(createResult.id).toBeDefined();
-    expect(createResult).toMatchObject(TEST_GAME);
+      // assert
+      expect(createResult).not.toBeNull();
+      expect(createResult.id).toBeDefined();
+      expect(createResult).toMatchObject(TEST_GAME);
 
-    const gameInDb = await gamesCollection.findOne({ id: createResult.id });
-    expect(gameInDb.id).toBeDefined();
-    expect(gameInDb).toMatchObject(TEST_GAME);
+      const gameInDb = await gamesCollection.findOne({ id: createResult.id });
+      expect(gameInDb.id).toBeDefined();
+      expect(gameInDb).toMatchObject(TEST_GAME);
+    });
   });
 
-  it('should find game by id and return it', async () => {
-    // prepare
-    const insertResult = await gamesCollection.insertOne(TEST_GAME);
-    const insertedGame = await gamesCollection.findOne({ _id: insertResult.insertedId });
+  describe('find', () => {
+    it('should find game by id and return it', async () => {
+      // arrange
+      const insertResult = await gamesCollection.insertOne(TEST_GAME);
+      const insertedGame = await gamesCollection.findOne({ _id: insertResult.insertedId });
 
-    // call
-    const findResult = await service.findById(insertedGame.id);
+      // act
+      const findResult = await service.findById(insertedGame.id);
 
-    // check
-    expect(findResult).not.toBeNull();
-    expect(findResult).toMatchObject(TEST_GAME);
+      // assert
+      expect(findResult).not.toBeNull();
+      expect(findResult).toMatchObject(TEST_GAME);
+    });
+
+    it('return null if game is not found', async () => {
+      // act
+      const findResult = await service.findById(WRONG_ID);
+
+      // assert
+      expect(findResult).toBeNull();
+    });
   });
 
-  it('should delete game by id and return it', async () => {
-    // prepare
-    const insertResult = await gamesCollection.insertOne(TEST_GAME);
-    const insertedGame = await gamesCollection.findOne({ _id: insertResult.insertedId });
+  describe('update', () => {
+    it('should update game by id and return updated game', async () => {
+      // arrange
+      const insertResult = await gamesCollection.insertOne(TEST_GAME);
+      const insertedGame = await gamesCollection.findOne({ _id: insertResult.insertedId });
 
-    // call
-    const deleteResult = await service.deleteById(insertedGame.id);
+      // act
+      const updateResult = await service.updateById(insertedGame.id, TEST_GAME_UPDATE);
 
-    // check
-    expect(deleteResult).not.toBeNull();
-    expect(deleteResult.id).toBe(insertedGame.id);
-    expect(deleteResult).toMatchObject(TEST_GAME);
+      // assert
+      expect(updateResult).not.toBeNull();
+      expect(updateResult.id).toBe(insertedGame.id);
+      expect(updateResult).toMatchObject(TEST_GAME_UPDATE);
 
-    const nonDeletedGame = await gamesCollection.findOne({ _id: insertedGame._id });
-    expect(nonDeletedGame).toBeNull();
+      const updatedGame = await gamesCollection.findOne({ _id: insertedGame._id });
+      expect(updatedGame).toMatchObject(TEST_GAME_UPDATE);
+    });
+
+    it('return null if game to update is not found', async () => {
+      // act
+      const updateResult = await service.updateById(WRONG_ID, TEST_GAME_UPDATE);
+
+      // assert
+      expect(updateResult).toBeNull();
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete game by id and return it', async () => {
+      // arrange
+      const insertResult = await gamesCollection.insertOne(TEST_GAME);
+      const insertedGame = await gamesCollection.findOne({ _id: insertResult.insertedId });
+
+      // act
+      const deleteResult = await service.deleteById(insertedGame.id);
+
+      // assert
+      expect(deleteResult).not.toBeNull();
+      expect(deleteResult.id).toBe(insertedGame.id);
+      expect(deleteResult).toMatchObject(TEST_GAME);
+
+      const nonDeletedGame = await gamesCollection.findOne({ _id: insertedGame._id });
+      expect(nonDeletedGame).toBeNull();
+    });
+
+    it('return null if game to delete is not found', async () => {
+      // act
+      const deleteResult = await service.deleteById(WRONG_ID);
+
+      // assert
+      expect(deleteResult).toBeNull();
+    });
   });
 });
