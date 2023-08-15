@@ -142,7 +142,7 @@ describe('CountriesService', () => {
     });
 
     it('should throw exception if country to delete has child city', async () => {
-      // prepare
+      // arrange
       await countriesCollection.insertOne(TEST_COUNTRY);
       await db.collection('cities').insertOne({ countryId: TEST_COUNTRY.id });
 
@@ -160,7 +160,7 @@ describe('CountriesService', () => {
     });
 
     it('should throw exception if country to delete has child league', async () => {
-      // prepare
+      // arrange
       await countriesCollection.insertOne(TEST_COUNTRY);
       await db.collection('leagues').insertOne({ countryId: TEST_COUNTRY.id });
 

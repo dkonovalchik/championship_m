@@ -1,12 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
 import { CreateMatchDto } from './dto/create-match.dto';
-import { Db } from 'mongodb';
+import { Collection, Db, Document } from 'mongodb';
 import { MONGODB_CONNECTION } from 'src/lib/constants';
+import { UpdateMatchDto } from './dto/update-match.dto';
+import { RecordNotFound } from 'src/lib/exceptions';
 
 @Injectable()
 export class MatchesService {
-  constructor(@Inject(MONGODB_CONNECTION) private readonly db: Db) {}
+  private readonly matchesCollection: Collection<Document>;
+
+  constructor(@Inject(MONGODB_CONNECTION) private readonly db: Db) {
+    this.matchesCollection = this.db.collection('matches');
+  }
 
   async create(dto: CreateMatchDto) {
     const newMatch = {
@@ -14,13 +20,13 @@ export class MatchesService {
       ...dto,
     };
 
-    await this.db.collection('matches').insertOne(newMatch);
+    await this.matchesCollection.insertOne(newMatch);
 
     return newMatch;
   }
 
   async findById(id: string) {
-    const match = await this.db.collection('matches').findOne({ id });
+    const match = await this.matchesCollection.findOne({ id });
     if (!match) {
       return null;
     }
@@ -36,5 +42,38 @@ export class MatchesService {
     }
 
     return match;
+  }
+
+  async updateById(id: string, dto: UpdateMatchDto) {
+    const match = await this.matchesCollection.findOne({ id });
+    if (!match) {
+      return null;
+    }
+
+    if (dto.hostId) {
+      const host = await this.db.collection('teams').findOne({ id: dto.hostId });
+      if (!host) {
+        throw new RecordNotFound();
+      }
+    }
+
+    if (dto.guestId) {
+      const guest = await this.db.collection('teams').findOne({ id: dto.guestId });
+      if (!guest) {
+        throw new RecordNotFound();
+      }
+    }
+
+    const updateResult = await this.matchesCollection.findOneAndUpdate(
+      { id },
+      { $set: dto },
+      { returnDocument: 'after' }
+    );
+    return updateResult.value;
+  }
+
+  async deleteById(id: string) {
+    const deleteResult = await this.matchesCollection.findOneAndDelete({ id });
+    return deleteResult.value;
   }
 }

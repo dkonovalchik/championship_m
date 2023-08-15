@@ -143,7 +143,7 @@ describe('GamesService', () => {
     });
 
     it('should throw exception if game to delete has child league', async () => {
-      // prepare
+      // arrange
       await gamesCollection.insertOne(TEST_GAME);
       await db.collection('leagues').insertOne({ gameId: TEST_GAME.id });
 
@@ -161,7 +161,7 @@ describe('GamesService', () => {
     });
 
     it('should throw exception if game to delete has child team', async () => {
-      // prepare
+      // arrange
       await gamesCollection.insertOne(TEST_GAME);
       await db.collection('teams').insertOne({ gameId: TEST_GAME.id });
 

@@ -87,11 +87,11 @@ describe('TeamsService', () => {
   describe('update', () => {
     it('should update team by id and return updated team', async () => {
       // arrange
-      const insertResult = await teamsCollection.insertOne(TEST_TEAM);
-      const insertedTeam = await teamsCollection.findOne({ _id: insertResult.insertedId });
-
       await db.collection('games').insertOne({ id: TEST_TEAM_UPDATE.gameId });
       await db.collection('cities').insertOne({ id: TEST_TEAM_UPDATE.cityId });
+
+      const insertResult = await teamsCollection.insertOne(TEST_TEAM);
+      const insertedTeam = await teamsCollection.findOne({ _id: insertResult.insertedId });
 
       // act
       const updateResult = await teamsService.updateById(insertedTeam.id, TEST_TEAM_UPDATE);
@@ -115,7 +115,7 @@ describe('TeamsService', () => {
     });
 
     it('should throw exception if game with specified id is absent in db', async () => {
-      // prepare
+      // arrange
       const insertResult = await teamsCollection.insertOne(TEST_TEAM);
       const insertedTeam = await teamsCollection.findOne({ _id: insertResult.insertedId });
 
@@ -133,7 +133,7 @@ describe('TeamsService', () => {
     });
 
     it('should throw exception if city with specified id is absent in db', async () => {
-      // prepare
+      // arrange
       const insertResult = await teamsCollection.insertOne(TEST_TEAM);
       const insertedTeam = await teamsCollection.findOne({ _id: insertResult.insertedId });
 

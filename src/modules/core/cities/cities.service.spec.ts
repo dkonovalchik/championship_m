@@ -113,7 +113,7 @@ describe('CitiesService', () => {
     });
 
     it('should throw exception if country with specified id is absent in db', async () => {
-      // prepare
+      // arrange
       const insertResult = await citiesCollection.insertOne(TEST_CITY);
       const insertedTeam = await citiesCollection.findOne({ _id: insertResult.insertedId });
 
@@ -158,7 +158,7 @@ describe('CitiesService', () => {
     });
 
     it('should throw exception if city to delete has child team', async () => {
-      // prepare
+      // arrange
       await citiesCollection.insertOne(TEST_CITY);
       await db.collection('teams').insertOne({ cityId: TEST_CITY.id });
 

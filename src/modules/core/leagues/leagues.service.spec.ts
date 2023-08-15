@@ -2,15 +2,31 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { LeaguesService } from './leagues.service';
 import { MONGODB_CONNECTION } from 'src/lib/constants';
 import { testMongoConnectionFactory } from 'src/lib/test-mongo-connection';
+import { Collection, Db, Document } from 'mongodb';
+import { HttpException } from '@nestjs/common';
+import { RecordNotFound } from 'src/lib/exceptions';
 
 describe('LeaguesService', () => {
-  let service: LeaguesService;
-
   const TEST_LEAGUE = {
-    name: 'Russian Premier League',
-    gameId: '5286a4d4-73ed-469d-aafd-984b0c5652b2',
-    countryId: 'c4e434b4-7429-4642-a4a0-943ebbe25afb',
+    id: 'test_id',
+    name: 'Name',
+    gameId: 'game_id',
+    countryId: 'country_id',
   };
+
+  const TEST_LEAGUE_UPDATE = {
+    name: 'New Name',
+    gameId: 'new_game_id',
+    countryId: 'new_country_id',
+  };
+
+  const WRONG_ID = 'wrong_id';
+
+  const TEST_LEAGUE_UPDATED = { ...TEST_LEAGUE, ...TEST_LEAGUE_UPDATE };
+
+  let leaguesService: LeaguesService;
+  let db: Db;
+  let leaguesCollection: Collection<Document>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -23,32 +39,146 @@ describe('LeaguesService', () => {
       ],
     }).compile();
 
-    service = module.get<LeaguesService>(LeaguesService);
+    leaguesService = module.get<LeaguesService>(LeaguesService);
+    db = module.get<Db>(MONGODB_CONNECTION);
+    leaguesCollection = db.collection('leagues');
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(leaguesService).toBeDefined();
   });
 
-  it('should create new league and return it', async () => {
-    const createdLeague = await service.create(TEST_LEAGUE);
+  describe('create', () => {
+    it('should create new league and return it', async () => {
+      // act
+      const createResult = await leaguesService.create(TEST_LEAGUE);
 
-    expect(createdLeague).not.toBeNull();
-    expect(createdLeague.id).toBeDefined();
-    expect(createdLeague.name).toBe(TEST_LEAGUE.name);
-    expect(createdLeague.gameId).toBe(TEST_LEAGUE.gameId);
-    expect(createdLeague.countryId).toBe(TEST_LEAGUE.countryId);
+      // assert
+      expect(createResult).not.toBeNull();
+      expect(createResult.id).toBeDefined();
+      expect(createResult).toMatchObject(TEST_LEAGUE);
+
+      const gameInDb = await leaguesCollection.findOne({ id: createResult.id });
+      expect(gameInDb).not.toBeNull();
+      expect(gameInDb.id).toBeDefined();
+      expect(gameInDb).toMatchObject(TEST_LEAGUE);
+    });
   });
 
-  it('should find league by id and return it', async () => {
-    const leagueInDb = await service.create(TEST_LEAGUE);
+  describe('read', () => {
+    it('should find league by id and return it', async () => {
+      // arrange
+      const insertResult = await leaguesCollection.insertOne(TEST_LEAGUE);
+      const insertedGame = await leaguesCollection.findOne({ _id: insertResult.insertedId });
 
-    const foundLeague = await service.findById(leagueInDb.id);
+      // act
+      const findResult = await leaguesService.findById(insertedGame.id);
 
-    expect(foundLeague).not.toBeNull();
-    expect(foundLeague.id).toBe(leagueInDb.id);
-    expect(foundLeague.name).toBe(leagueInDb.name);
-    expect(foundLeague.gameId).toBe(leagueInDb.gameId);
-    expect(foundLeague.countryId).toBe(leagueInDb.countryId);
+      // assert
+      expect(findResult).not.toBeNull();
+      expect(findResult).toMatchObject(TEST_LEAGUE);
+    });
+
+    it('should return null if league is not found', async () => {
+      // act
+      const findResult = await leaguesService.findById(WRONG_ID);
+
+      // assert
+      expect(findResult).toBeNull();
+    });
+  });
+
+  describe('update', () => {
+    it('should update league by id and return updated league', async () => {
+      // arrange
+      await db.collection('games').insertOne({ id: TEST_LEAGUE_UPDATE.gameId });
+      await db.collection('countries').insertOne({ id: TEST_LEAGUE_UPDATE.countryId });
+
+      const insertResult = await leaguesCollection.insertOne(TEST_LEAGUE);
+      const insertedLeague = await leaguesCollection.findOne({ _id: insertResult.insertedId });
+
+      // act
+      const updateResult = await leaguesService.updateById(insertedLeague.id, TEST_LEAGUE_UPDATE);
+
+      // assert
+      expect(updateResult).not.toBeNull();
+      expect(updateResult.id).toBe(insertedLeague.id);
+      expect(updateResult).toMatchObject(TEST_LEAGUE_UPDATED);
+
+      const updatedGame = await leaguesCollection.findOne({ _id: insertedLeague._id });
+      expect(updatedGame).not.toBeNull();
+      expect(updatedGame).toMatchObject(TEST_LEAGUE_UPDATED);
+    });
+
+    it('should return null if league to update is not found', async () => {
+      // act
+      const updateResult = await leaguesService.updateById(WRONG_ID, TEST_LEAGUE_UPDATE);
+
+      // assert
+      expect(updateResult).toBeNull();
+    });
+
+    it('should throw exception if game with specified id is absent in db', async () => {
+      // arrange
+      const insertResult = await leaguesCollection.insertOne(TEST_LEAGUE);
+      const insertedLeague = await leaguesCollection.findOne({ _id: insertResult.insertedId });
+
+      // act
+      let error: HttpException;
+      try {
+        await leaguesService.updateById(insertedLeague.id, { gameId: WRONG_ID });
+      } catch (e) {
+        error = e;
+      }
+
+      // assert
+      expect(error).toBeDefined();
+      expect(error).toBeInstanceOf(RecordNotFound);
+    });
+
+    it('should throw exception if country with specified id is absent in db', async () => {
+      // arrange
+      const insertResult = await leaguesCollection.insertOne(TEST_LEAGUE);
+      const insertedTeam = await leaguesCollection.findOne({ _id: insertResult.insertedId });
+
+      // act
+      let error: HttpException;
+      try {
+        await leaguesService.updateById(insertedTeam.id, { countryId: WRONG_ID });
+      } catch (e) {
+        error = e;
+      }
+
+      // assert
+      expect(error).toBeDefined();
+      expect(error).toBeInstanceOf(RecordNotFound);
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete league by id and return it', async () => {
+      // arrange
+      const insertResult = await leaguesCollection.insertOne(TEST_LEAGUE);
+      const insertedGame = await leaguesCollection.findOne({ _id: insertResult.insertedId });
+
+      // act
+      const deleteResult = await leaguesService.deleteById(insertedGame.id);
+
+      // assert
+      expect(deleteResult).not.toBeNull();
+      expect(deleteResult.id).toBe(insertedGame.id);
+      expect(deleteResult).toMatchObject(TEST_LEAGUE);
+
+      const nonDeletedGame = await leaguesCollection.findOne({ _id: insertedGame._id });
+      expect(nonDeletedGame).toBeNull();
+    });
+
+    it('should return null if league to delete is not found', async () => {
+      // act
+      const deleteResult = await leaguesService.deleteById(WRONG_ID);
+
+      // assert
+      expect(deleteResult).toBeNull();
+    });
   });
 });
