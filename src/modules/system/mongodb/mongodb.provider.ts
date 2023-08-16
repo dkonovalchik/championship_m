@@ -1,5 +1,5 @@
 import { MongoClient } from 'mongodb';
-import { MONGODB_CONNECTION } from 'src/lib/constants';
+import { MONGODB_CONNECTION } from '../../../lib/constants';
 
 export const MongodbProvider = {
   provide: MONGODB_CONNECTION,

@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/commo
 import { GamesService } from './games.service';
 import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
-import { RecordNotFound } from 'src/lib/exceptions';
+import { RecordNotFound } from '../../../lib/exceptions';
 
 @Controller('games')
 export class GamesController {

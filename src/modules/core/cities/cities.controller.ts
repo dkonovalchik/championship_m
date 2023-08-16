@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { CitiesService } from './cities.service';
 import { CreateCityDto } from './dto/create-city.dto';
-import { RecordNotFound } from 'src/lib/exceptions';
+import { RecordNotFound } from '../../../lib/exceptions';
 import { UpdateCityDto } from './dto/update-city.dto';
 
 @Controller('cities')

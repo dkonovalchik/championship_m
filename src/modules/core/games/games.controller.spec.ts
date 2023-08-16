@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GamesService } from './games.service';
 import { GamesController } from './games.controller';
-import { testMongoConnectionFactory } from 'src/lib/test-mongo-connection';
-import { MONGODB_CONNECTION } from 'src/lib/constants';
-import { RecordNotFound } from 'src/lib/exceptions';
+import { testMongoConnectionFactory } from '../../../lib/test-mongo-connection';
+import { MONGODB_CONNECTION } from '../../../lib/constants';
+import { RecordNotFound } from '../../../lib/exceptions';
 import { HttpException } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
 

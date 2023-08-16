@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TeamsService } from './teams.service';
-import { testMongoConnectionFactory } from 'src/lib/test-mongo-connection';
-import { MONGODB_CONNECTION } from 'src/lib/constants';
+import { testMongoConnectionFactory } from '../../../lib/test-mongo-connection';
+import { MONGODB_CONNECTION } from '../../../lib/constants';
 import { Db } from 'mongodb';
 import { HttpException } from '@nestjs/common';
-import { RecordNotFound } from 'src/lib/exceptions';
+import { RecordNotFound } from '../../../lib/exceptions';
 
 describe('TeamsService', () => {
   const TEST_TEAM = {

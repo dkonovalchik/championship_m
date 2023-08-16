@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { Collection, Db, Document } from 'mongodb';
-import { MONGODB_CONNECTION } from 'src/lib/constants';
+import { MONGODB_CONNECTION } from '../../../lib/constants';
 import { UpdateMatchDto } from './dto/update-match.dto';
-import { RecordNotFound } from 'src/lib/exceptions';
+import { RecordNotFound } from '../../../lib/exceptions';
 
 @Injectable()
 export class MatchesService {

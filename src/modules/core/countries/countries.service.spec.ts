@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CountriesService } from './countries.service';
-import { MONGODB_CONNECTION } from 'src/lib/constants';
-import { testMongoConnectionFactory } from 'src/lib/test-mongo-connection';
+import { MONGODB_CONNECTION } from '../../../lib/constants';
+import { testMongoConnectionFactory } from '../../../lib/test-mongo-connection';
 import { Collection, Db, Document } from 'mongodb';
 import { HttpException } from '@nestjs/common';
-import { CannotDeleteRecordWithChildren } from 'src/lib/exceptions';
+import { CannotDeleteRecordWithChildren } from '../../../lib/exceptions';
 
 describe('CountriesService', () => {
   const TEST_COUNTRY = {

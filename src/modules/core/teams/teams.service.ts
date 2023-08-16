@@ -2,10 +2,10 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { v4 as uuid } from 'uuid';
 import { Db } from 'mongodb';
-import { MONGODB_CONNECTION } from 'src/lib/constants';
+import { MONGODB_CONNECTION } from '../../../lib/constants';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { Collection, Document } from 'mongodb';
-import { RecordNotFound } from 'src/lib/exceptions';
+import { RecordNotFound } from '../../../lib/exceptions';
 
 @Injectable()
 export class TeamsService {

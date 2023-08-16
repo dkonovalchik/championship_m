@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreateCountryDto } from './dto/create-country.dto';
 import { v4 as uuid } from 'uuid';
 import { Collection, Db, Document } from 'mongodb';
-import { MONGODB_CONNECTION } from 'src/lib/constants';
+import { MONGODB_CONNECTION } from '../../../lib/constants';
 import { UpdateCountryDto } from './dto/update-country.dto';
-import { CannotDeleteRecordWithChildren } from 'src/lib/exceptions';
+import { CannotDeleteRecordWithChildren } from '../../../lib/exceptions';
 
 @Injectable()
 export class CountriesService {

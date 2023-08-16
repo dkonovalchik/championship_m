@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreateGameDto } from './dto/create-game.dto';
 import { v4 as uuid } from 'uuid';
 import { Db } from 'mongodb';
-import { MONGODB_CONNECTION } from 'src/lib/constants';
+import { MONGODB_CONNECTION } from '../../../lib/constants';
 import { UpdateGameDto } from './dto/update-game.dto';
-import { CannotDeleteRecordWithChildren } from 'src/lib/exceptions';
+import { CannotDeleteRecordWithChildren } from '../../../lib/exceptions';
 import { Collection, Document } from 'mongodb';
 
 @Injectable()

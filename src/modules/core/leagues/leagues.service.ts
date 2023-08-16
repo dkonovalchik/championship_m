@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreateLeagueDto } from './dto/create-league.dto';
 import { v4 as uuid } from 'uuid';
 import { Collection, Db, Document } from 'mongodb';
-import { MONGODB_CONNECTION } from 'src/lib/constants';
+import { MONGODB_CONNECTION } from '../../../lib/constants';
 import { UpdateLeagueDto } from './dto/update-league.dto';
-import { RecordNotFound } from 'src/lib/exceptions';
+import { RecordNotFound } from '../../../lib/exceptions';
 
 @Injectable()
 export class LeaguesService {

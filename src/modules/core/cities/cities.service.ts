@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreateCityDto } from './dto/create-city.dto';
 import { v4 as uuid } from 'uuid';
 import { Collection, Db, Document } from 'mongodb';
-import { MONGODB_CONNECTION } from 'src/lib/constants';
+import { MONGODB_CONNECTION } from '../../../lib/constants';
 import { UpdateCityDto } from './dto/update-city.dto';
-import { CannotDeleteRecordWithChildren, RecordNotFound } from 'src/lib/exceptions';
+import { CannotDeleteRecordWithChildren, RecordNotFound } from '../../../lib/exceptions';
 
 @Injectable()
 export class CitiesService {

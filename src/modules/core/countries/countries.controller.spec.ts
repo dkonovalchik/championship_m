@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CountriesController } from './countries.controller';
 import { CountriesService } from './countries.service';
-import { MONGODB_CONNECTION } from 'src/lib/constants';
-import { testMongoConnectionFactory } from 'src/lib/test-mongo-connection';
+import { MONGODB_CONNECTION } from '../../../lib/constants';
+import { testMongoConnectionFactory } from '../../../lib/test-mongo-connection';
 import { ObjectId } from 'mongodb';
 import { HttpException } from '@nestjs/common';
-import { RecordNotFound } from 'src/lib/exceptions';
+import { RecordNotFound } from '../../../lib/exceptions';
 
 describe('CountriesController', () => {
   const TEST_COUNTRY = {
